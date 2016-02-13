@@ -1,18 +1,14 @@
 package com.thevarunshah.checkin;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
+import android.app.usage.UsageEvents;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -26,10 +22,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Scanner;
 
-/**
- * A login screen that offers login via email/password.
- */
-public class LoginActivity extends AppCompatActivity{
+public class RegisterActivity extends AppCompatActivity{
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -37,19 +30,18 @@ public class LoginActivity extends AppCompatActivity{
     private UserLoginTask mAuthTask = null;
 
     // UI references.
+    private EditText mNameView;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_activity);
+        setContentView(R.layout.register_activity);
         // Set up the login form.
+        mNameView = (EditText) findViewById(R.id.name);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -62,25 +54,13 @@ public class LoginActivity extends AppCompatActivity{
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        Button mRegisterButton = (Button) findViewById(R.id.register_button);
+        mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 attemptLogin();
             }
         });
-
-        Button mRegisterButton = (Button) findViewById(R.id.register_button);
-        mRegisterButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(i);
-            }
-        });
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
     }
 
     private void doHttpPost(String[] params){
@@ -91,8 +71,8 @@ public class LoginActivity extends AppCompatActivity{
 
         try{
 
-            url = new URL("http://ef92dda.ngrok.com/api/user/login");
-            param = "email=" + URLEncoder.encode(params[1], "UTF-8") + "&password=" + URLEncoder.encode(params[2], "UTF-8");
+            url = new URL("http://ef92dda.ngrok.com/api/user/create");
+            param = "name=" + URLEncoder.encode(params[0], "UTF-8") + "&email=" + URLEncoder.encode(params[1], "UTF-8") + "&password=" + URLEncoder.encode(params[2], "UTF-8");
 
             conn = (HttpURLConnection)url.openConnection();
             conn.setDoOutput(true);
@@ -110,21 +90,13 @@ public class LoginActivity extends AppCompatActivity{
                 response += (inStream.nextLine());
             }
 
-            Log.d("Login", response);
-            Intent i = new Intent(LoginActivity.this, EventsActivity.class);
+            Log.d("Register", response);
+            Intent i = new Intent(RegisterActivity.this, EventsActivity.class);
             startActivity(i);
-            /*
-            final String responseF = response;
 
-            getParent().runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(getApplicationContext(), responseF, Toast.LENGTH_SHORT).show();
-                }
-            });
-            */
         } catch(final IOException e){
 
-            Log.d("Login", e.toString());
+            Log.d("Register", e.toString());
         }
     }
 
@@ -146,6 +118,7 @@ public class LoginActivity extends AppCompatActivity{
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String name = mNameView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -175,8 +148,7 @@ public class LoginActivity extends AppCompatActivity{
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask("test", email, password);
+            mAuthTask = new UserLoginTask(name, email, password);
             mAuthTask.execute((Void) null);
         }
     }
@@ -189,42 +161,6 @@ public class LoginActivity extends AppCompatActivity{
     private boolean isPasswordValid(String password) {
 
         return password.length() > 4;
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
     }
 
     /**
@@ -254,7 +190,6 @@ public class LoginActivity extends AppCompatActivity{
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
 
             if (success) {
                 finish();
@@ -267,8 +202,6 @@ public class LoginActivity extends AppCompatActivity{
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            showProgress(false);
         }
     }
 }
-
