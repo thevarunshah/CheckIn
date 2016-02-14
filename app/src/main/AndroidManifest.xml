@@ -30,7 +30,13 @@
             android:label="@string/event_view"/>
         <activity
             android:name=".YourEventsActivity"
-            android:label="@string/event_view"/>
+            android:label="Your Events"/>
+        <activity
+            android:name=".RegisteredEventViewActivity"
+            android:label="Registered Event"/>
+        <activity
+            android:name=".CreatedEventViewActivity"
+            android:label="Created Event"/>
     </application>
 
 </manifest>

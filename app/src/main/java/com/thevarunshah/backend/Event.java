@@ -13,8 +13,14 @@ public class Event {
         this.id = id;
         this.admin_id = admin_id;
         this.name = name;
-        this.date = dateTime.substring(0, dateTime.indexOf(' '));
-        this.time = dateTime.substring(dateTime.indexOf(' ')+1, dateTime.length()-3);
+        if(dateTime.indexOf(' ') == -1){
+            this.date = dateTime.substring(0, dateTime.indexOf('T'));
+            this.time = dateTime.substring(dateTime.indexOf('T')+1, dateTime.length()-5);
+        }
+        else {
+            this.date = dateTime.substring(0, dateTime.indexOf(' '));
+            this.time = dateTime.substring(dateTime.indexOf(' ')+1, dateTime.length()-3);
+        }
         this.description = description;
     }
 }

@@ -83,7 +83,7 @@ public class YourEventsActivity extends AppCompatActivity{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Event e = registeredEvents.get(position);
-                Intent i = new Intent(YourEventsActivity.this, EventViewActivity.class);
+                Intent i = new Intent(YourEventsActivity.this, RegisteredEventViewActivity.class);
                 Bundle extra = new Bundle();
                 extra.putInt("id", e.id);
                 extra.putString("name", e.name);
@@ -111,7 +111,7 @@ public class YourEventsActivity extends AppCompatActivity{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Event e = createdEvents.get(position);
-                Intent i = new Intent(YourEventsActivity.this, EventViewActivity.class);
+                Intent i = new Intent(YourEventsActivity.this, CreatedEventViewActivity.class);
                 Bundle extra = new Bundle();
                 extra.putInt("id", e.id);
                 extra.putString("name", e.name);
