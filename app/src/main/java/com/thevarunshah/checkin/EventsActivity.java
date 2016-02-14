@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -17,14 +19,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class EventsActivity extends AppCompatActivity {
 
@@ -37,13 +37,11 @@ public class EventsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.events_activity);
 
-        String eventsListResponse = HttpGet(Backend.baseURL + "/events/list" +
-                "?token=" + Backend.token);
-        Log.d("Events", eventsListResponse);
+        String eventsListResponse = doHttpPost();
         final ArrayList<Event> events = new ArrayList<Event>();
         try {
             JSONObject eventsJSONResponse = new JSONObject(eventsListResponse);
-            JSONArray response = eventsJSONResponse.getJSONArray("response");
+            JSONArray response = eventsJSONResponse.getJSONArray("not_registered");
             for(int i = 0; i < response.length(); i++){
                 JSONObject jsonObject = response.getJSONObject(i);
                 int id = jsonObject.getInt("id");
@@ -87,6 +85,55 @@ public class EventsActivity extends AppCompatActivity {
         });
     }
 
+    private String doHttpPost(){
+
+        URL url;
+        HttpURLConnection conn;
+
+        try{
+
+            url = new URL(Backend.baseURL + "/user/events?token=" + Backend.token);
+
+            conn = (HttpURLConnection)url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            String response = "";
+            Scanner inStream = new Scanner(conn.getInputStream());
+            while(inStream.hasNextLine()) {
+                response += (inStream.nextLine());
+            }
+
+            Log.d("Events", response);
+            return response;
+
+        } catch(final IOException e){
+
+            Log.d("Events", e.toString());
+            return "";
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.events_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.your_events:
+                Intent i = new Intent(EventsActivity.this, YourEventsActivity.class);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /*
     private static String HttpGet(String url){
 
         try{
@@ -110,4 +157,5 @@ public class EventsActivity extends AppCompatActivity {
 
         return null;
     }
+    */
 }

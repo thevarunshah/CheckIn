@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 
 public class Backend {
 
-    public static String baseURL = "http://ef92dda.ngrok.com/api";
+    public static String baseURL = "http://2112d6b6.ngrok.com/api";
     public static String token = null;
 
     public static void backupToken(Context context){

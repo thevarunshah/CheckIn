@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/registered_events_label"
+        android:padding="16dp"
+        android:text="Registered Events"
+        android:textSize="25sp"/>
+
+    <ListView
+        android:id="@+id/registered_events_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/created_events_label"
+        android:padding="16dp"
+        android:text="Created Events"
+        android:textSize="25sp"/>
+
+    <ListView
+        android:id="@+id/created_events_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"/>
+
+</LinearLayout>

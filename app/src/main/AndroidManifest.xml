@@ -28,6 +28,9 @@
         <activity
             android:name=".EventViewActivity"
             android:label="@string/event_view"/>
+        <activity
+            android:name=".YourEventsActivity"
+            android:label="@string/event_view"/>
     </application>
 
 </manifest>
