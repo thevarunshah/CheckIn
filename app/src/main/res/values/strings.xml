@@ -3,6 +3,7 @@
     <string name="sign_in">Sign In</string>
     <string name="register">Register</string>
     <string name="view_events">Events</string>
+    <string name="event_view">Event</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

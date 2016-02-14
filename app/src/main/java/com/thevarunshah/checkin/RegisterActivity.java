@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.thevarunshah.backend.Backend;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -71,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity{
 
         try{
 
-            url = new URL("http://ef92dda.ngrok.com/api/user/create");
+            url = new URL(Backend.baseURL + "/user/create");
             param = "name=" + URLEncoder.encode(params[0], "UTF-8") + "&email=" + URLEncoder.encode(params[1], "UTF-8") + "&password=" + URLEncoder.encode(params[2], "UTF-8");
 
             conn = (HttpURLConnection)url.openConnection();
@@ -91,6 +93,9 @@ public class RegisterActivity extends AppCompatActivity{
             }
 
             Log.d("Register", response);
+            String token = response.substring(response.indexOf("token")+8, response.indexOf("\"", response.indexOf("token")+8));
+            Backend.token = token;
+            Backend.backupToken(this);
             Intent i = new Intent(RegisterActivity.this, EventsActivity.class);
             startActivity(i);
 

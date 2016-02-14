@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.thevarunshah.backend.Backend;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -47,6 +49,13 @@ public class LoginActivity extends AppCompatActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
+
+        Backend.readToken(this);
+        if(Backend.token != null){
+            Intent i = new Intent(LoginActivity.this, EventsActivity.class);
+            startActivity(i);
+        }
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
@@ -91,8 +100,8 @@ public class LoginActivity extends AppCompatActivity{
 
         try{
 
-            url = new URL("http://ef92dda.ngrok.com/api/user/login");
-            param = "email=" + URLEncoder.encode(params[1], "UTF-8") + "&password=" + URLEncoder.encode(params[2], "UTF-8");
+            url = new URL(Backend.baseURL + "/user/login");
+            param = "email=" + URLEncoder.encode(params[0], "UTF-8") + "&password=" + URLEncoder.encode(params[1], "UTF-8");
 
             conn = (HttpURLConnection)url.openConnection();
             conn.setDoOutput(true);
@@ -111,6 +120,9 @@ public class LoginActivity extends AppCompatActivity{
             }
 
             Log.d("Login", response);
+            String token = response.substring(response.indexOf("token")+8, response.indexOf("\"", response.indexOf("token")+8));
+            Backend.token = token;
+            Backend.backupToken(this);
             Intent i = new Intent(LoginActivity.this, EventsActivity.class);
             startActivity(i);
             /*
@@ -176,7 +188,7 @@ public class LoginActivity extends AppCompatActivity{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask("test", email, password);
+            mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
     }
@@ -233,12 +245,10 @@ public class LoginActivity extends AppCompatActivity{
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mName;
         private final String mEmail;
         private final String mPassword;
 
-        UserLoginTask(String name, String email, String password) {
-            mName = name;
+        UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
         }
@@ -246,7 +256,7 @@ public class LoginActivity extends AppCompatActivity{
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            String[] paramsArr = new String[]{mName, mEmail, mPassword};
+            String[] paramsArr = new String[]{mEmail, mPassword};
             doHttpPost(paramsArr);
             return true;
         }
