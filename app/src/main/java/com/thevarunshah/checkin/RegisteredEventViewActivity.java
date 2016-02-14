@@ -1,6 +1,8 @@
 package com.thevarunshah.checkin;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -9,8 +11,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.thevarunshah.backend.Backend;
 
 import java.io.IOException;
@@ -49,6 +57,35 @@ public class RegisteredEventViewActivity extends AppCompatActivity{
                 doHttpPost(b.getInt("id"));
             }
         });
+
+        Button showQRCode = (Button) findViewById(R.id.view_qr_code_button);
+        showQRCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                generateQRCode(v);
+            }
+        });
+    }
+
+    public  void generateQRCode(View view){
+
+        QRCodeWriter writer=new QRCodeWriter();
+        try{
+
+            BitMatrix bitMatrix = writer.encode(Backend.token, BarcodeFormat.QR_CODE, 720, 720);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                }
+            }
+            ((ImageView) findViewById(R.id.qr_imageview)).setImageBitmap(bmp);
+        }
+        catch (WriterException e) {
+
+        }
     }
 
     private void doHttpPost(int id){

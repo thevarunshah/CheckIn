@@ -37,6 +37,9 @@
         <activity
             android:name=".CreatedEventViewActivity"
             android:label="Created Event"/>
+        <activity
+            android:name=".AdminCheckInViewActivity"
+            android:label="Attendees"/>
     </application>
 
 </manifest>

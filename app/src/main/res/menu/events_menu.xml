@@ -3,6 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/your_events"
-        app:showAsAction="never"
+        app:showAsAction="always"
         android:title="Your Events"/>
 </menu>

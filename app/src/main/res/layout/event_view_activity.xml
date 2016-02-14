@@ -45,6 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Join"
+        android:textColor="@android:color/black"
         android:padding="@dimen/activity_vertical_margin"
         android:id="@+id/join_button"/>
 </LinearLayout>

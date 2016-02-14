@@ -50,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Show QR Code"
+            android:textColor="@android:color/black"
             android:padding="@dimen/activity_vertical_margin"
             android:id="@+id/view_qr_code_button"/>
 
@@ -57,7 +58,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Leave"
+            android:textColor="@android:color/black"
             android:padding="@dimen/activity_vertical_margin"
             android:id="@+id/leave_button"/>
     </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/qr_imageview"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </LinearLayout>

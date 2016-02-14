@@ -8,22 +8,32 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.thevarunshah.backend.AttendeeAdapter;
 import com.thevarunshah.backend.Backend;
+import com.thevarunshah.backend.Event;
+import com.thevarunshah.backend.User;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
-public class CreatedEventViewActivity extends AppCompatActivity{
+public class AdminCheckInViewActivity extends AppCompatActivity{
 
     Bundle b;
 
@@ -34,35 +44,38 @@ public class CreatedEventViewActivity extends AppCompatActivity{
             StrictMode.setThreadPolicy(policy);
         }
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.created_event_view_activity);
-
-        TextView nameTV = (TextView) findViewById(R.id.name_view);
-        TextView dateTV = (TextView) findViewById(R.id.date_view);
-        TextView timeTV = (TextView) findViewById(R.id.time_view);
-        TextView descriptionTV = (TextView) findViewById(R.id.description_view);
+        setContentView(R.layout.admin_checkin_view);
 
         b = getIntent().getBundleExtra("bundle");
-        nameTV.setText(b.getString("name"));
-        dateTV.setText(b.getString("date"));
-        timeTV.setText(b.getString("time"));
-        descriptionTV.setText(b.getString("description"));
 
-        Button leave = (Button) findViewById(R.id.delete_button);
-        leave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                doHttpPost(b.getInt("id"));
+        String eventsListResponse = doHttpPost(b.getInt("id"));
+        final ArrayList<User> users = new ArrayList<User>();
+        try {
+            JSONObject eventsJSONResponse = new JSONObject(eventsListResponse);
+            JSONObject mainResponse = eventsJSONResponse.getJSONObject("response");
+            JSONArray response = mainResponse.getJSONArray("attendees");
+            for (int i = 0; i < response.length(); i++) {
+                JSONObject jsonObject = response.getJSONObject(i);
+                int id = jsonObject.getInt("id");
+                String name = jsonObject.getString("name");
+                JSONObject pivot = jsonObject.getJSONObject("pivot");
+                String checkedIn = pivot.getString("has_checked_in");
+                User u;
+                if(checkedIn.equals("0")){
+                    u = new User(id, name, false);
+                }
+                else{
+                    u = new User(id, name, true);
+                }
+                users.add(u);
             }
-        });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        Button scan = (Button) findViewById(R.id.check_in_button);
-        scan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                IntentIntegrator scanIntegrator = new IntentIntegrator(CreatedEventViewActivity.this);
-                scanIntegrator.initiateScan();
-            }
-        });
+        ListView lv = (ListView) findViewById(R.id.admin_listview);
+        AttendeeAdapter listAdapter = new AttendeeAdapter(this, users);
+        lv.setAdapter(listAdapter);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -114,7 +127,7 @@ public class CreatedEventViewActivity extends AppCompatActivity{
             }
 
             Log.d("Event View - Check in", response);
-            Intent i = new Intent(CreatedEventViewActivity.this, AdminCheckInViewActivity.class);
+            Intent i = new Intent(AdminCheckInViewActivity.this, AdminCheckInViewActivity.class);
             Bundle extra = new Bundle();
             extra.putInt("id", b.getInt("id"));
             i.putExtra("bundle", extra);
@@ -126,7 +139,7 @@ public class CreatedEventViewActivity extends AppCompatActivity{
         }
     }
 
-    private void doHttpPost(int id){
+    private String doHttpPost(int id){
 
         URL url;
         String param;
@@ -134,7 +147,7 @@ public class CreatedEventViewActivity extends AppCompatActivity{
 
         try{
 
-            url = new URL(Backend.baseURL + "/events/delete/" + id);
+            url = new URL(Backend.baseURL + "/events/" + id + "/details");
             param = "token=" + URLEncoder.encode(Backend.token, "UTF-8");
 
             conn = (HttpURLConnection)url.openConnection();
@@ -153,28 +166,28 @@ public class CreatedEventViewActivity extends AppCompatActivity{
                 response += (inStream.nextLine());
             }
 
-            Log.d("Event View - Delete", response);
-            Intent i = new Intent(CreatedEventViewActivity.this, YourEventsActivity.class);
-            startActivity(i);
+            Log.d("Admin View", response);
+            return response;
 
         } catch(final IOException e){
 
-            Log.d("Event View - Delete", e.toString());
+            Log.d("Admin View", e.toString());
+            return "";
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.event_view_activity, menu);
+        getMenuInflater().inflate(R.menu.admin_view_activity, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.all_events:
-                Intent i = new Intent(CreatedEventViewActivity.this, EventsActivity.class);
-                startActivity(i);
+            case R.id.start_check_in:
+                IntentIntegrator scanIntegrator = new IntentIntegrator(AdminCheckInViewActivity.this);
+                scanIntegrator.initiateScan();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

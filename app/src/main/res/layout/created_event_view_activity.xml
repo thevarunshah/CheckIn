@@ -50,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Start Check In"
+            android:textColor="@android:color/black"
             android:padding="@dimen/activity_vertical_margin"
             android:id="@+id/check_in_button"/>
 
@@ -57,6 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Delete"
+            android:textColor="@android:color/black"
             android:padding="@dimen/activity_vertical_margin"
             android:id="@+id/delete_button"/>
     </LinearLayout>
